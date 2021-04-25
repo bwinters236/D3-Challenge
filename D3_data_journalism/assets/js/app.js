@@ -35,7 +35,7 @@ d3.csv("data.csv").then(function(stateData) {
     });
 
     var xLinearScale = d3.scaleLinear()
-        .domain([20, d3.max(stateData, d => d.poverty)])
+        .domain([0, d3.max(stateData, d => d.poverty)])
         .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
@@ -53,29 +53,44 @@ d3.csv("data.csv").then(function(stateData) {
     chartGroup.append("g")
         .call(leftAxis);
 
-    var circlesGroup = chartGroup.selectAll("circle")
+    var circleGroup = chartGroup.selectAll("circle")
         .data(stateData)
         .enter()
         .append("circle")
         .attr("cx", d => xLinearScale(d.poverty))
         .attr("cy", d => yLinearScale(d.obesity))
         .attr("r", "15")
-        .attr("fill", "red")
+        .attr("class", "stateCircle")
         .attr("opacity", ".5");
 
-        chartGroup.selectAll("div")
-        .data(stateData)
-        .enter()
-        .append("text")
 
-        .attr("x", function (d){
-            return xLinearScale(d.poverty);
+        circleGroup.append("text")
+        .text(function(d){
+          return d.abbr
         })
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.obesity))
+        .attr("class", "stateText")
+        .attr("dy", +4)
+        .attr("font-size", 10)
 
-        .attr("y", function (d){
-            return yLinearScale(d.obesity);
-        })
-        .attr("alignment-baseline", "central")
+
+
+
+    chartGroup.selectAll("div")
+      .data(stateData)
+      .enter()
+      .append("text")
+
+      .attr("x", function (d){
+          return xLinearScale(d.poverty);
+      })
+
+      .attr("y", function (d){
+          return yLinearScale(d.obesity);
+      })
+      .attr("alignment-baseline", "central")
+
 
         // Create axes labels
     chartGroup.append("text")
@@ -84,12 +99,13 @@ d3.csv("data.csv").then(function(stateData) {
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .attr("class", "axisText")
-        .text("axis text");
+        .text("Obesity %");
   
     chartGroup.append("text")
         .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
         .attr("class", "axisText")
-        .text("axis text");
+        .text("Poverty %");
+
 
 
 }).catch(function(error) {
